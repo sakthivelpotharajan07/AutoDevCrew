@@ -1,0 +1,17 @@
+FROM python:3.9-slim
+
+WORKDIR /app
+
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY . .
+
+# Expose API and Streamlit ports
+EXPOSE 8000
+EXPOSE 8501
+
+COPY deployment/app_start.sh .
+RUN chmod +x app_start.sh
+
+CMD ["./app_start.sh"]

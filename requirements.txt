@@ -1,0 +1,12 @@
+transformers
+torch
+chromadb
+google-generativeai
+sentence-transformers
+fastapi
+uvicorn
+streamlit
+pytest
+pyyaml
+accelerate
+bitsandbytes
