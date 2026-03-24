@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cake Details</title>
+</head>
+<body>
+    <h1>Cake Details</h1>
+    <p>Cake Name: {{ cake.name }}</p>
+    <p>Cake Description: {{ cake.description }}</p>
+    <p>Price: {{ cake.price }}</p>
+    <p>Size: {{ cake.size }}</p>
+    <p>Flavor: {{ cake.flavor }}</p>
+    <form action="/order" method="post">
+        <input type="hidden" name="cake_id" value="{{ cake.id }}">
+        <label for="quantity">Quantity:</label>
+        <input type="number" id="quantity" name="quantity" min="1" value="1">
+        <button type="submit">Order Now</button>
+    </form>
+</body>
+</html>

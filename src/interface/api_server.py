@@ -1,7 +1,17 @@
+import sys
+import os
+from pathlib import Path
+
+# Add project root to sys.path to allow 'src' imports
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.append(str(PROJECT_ROOT))
+
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from contextlib import asynccontextmanager
 from src.core.orchestrator import Orchestrator
+from src.agents.task_agent import TaskAgent
 from src.agents.engineer_agent import EngineerAgent
 from src.agents.tester_agent import TesterAgent
 from src.agents.devops_agent import DevOpsAgent
@@ -19,14 +29,15 @@ async def lifespan(app: FastAPI):
     global orchestrator
     logger.info("Initializing Orchestrator...")
     orchestrator = Orchestrator()
+    orchestrator.register_agent(TaskAgent())
     orchestrator.register_agent(EngineerAgent())
     orchestrator.register_agent(TesterAgent())
     orchestrator.register_agent(DevOpsAgent())
     orchestrator.register_agent(SummarizerAgent())
     
     # Optionally trigger model load in background or just wait for first request
-    # orchestrator.llm.load_model() 
-    logger.info("Orchestrator initialized.")
+    # orchestrator.llm.load_model()  
+    logger.info("Orchestrator initialized with agents.")
     yield
     # Clean up resources if needed
     logger.info("Shutting down...")

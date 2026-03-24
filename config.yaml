@@ -3,9 +3,9 @@ system:
   version: "1.0.0"
 
 llm:
-  provider: "gemini" # Options: "local", "gemini"
-  api_key: "AIzaSyCh64XEYKppPGEbZFDXcOAx8oMHQk7AFDs" # Replace with your actual key
-  model_id: "gemini-1.5-flash"  # Or "TinyLlama/TinyLlama-1.1B-Chat-v1.0" for local
+  provider: "groq" # Options: "local", "gemini"
+  api_key: "YOUR_GROQ_API_KEY_HERE" # Replace with your actual key
+  model_id: "llama-3.3-70b-versatile"  # Or "TinyLlama/TinyLlama-1.1B-Chat-v1.0" for local
   device: "auto"
   max_length: 2048
   temperature: 0.7
@@ -15,7 +15,7 @@ memory:
   collection: "autodevcrew_memory"
 
 embeddings:
-  model: "all-MiniLM-L6-v2"
+  model: "sentence-transformers/all-MiniLM-L6-v2"
 
 server:
   host: "0.0.0.0"

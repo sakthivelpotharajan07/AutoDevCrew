@@ -8,6 +8,7 @@ import argparse
 import uvicorn
 import subprocess
 from src.core.orchestrator import Orchestrator
+from src.agents.task_agent import TaskAgent
 from src.agents.engineer_agent import EngineerAgent
 from src.agents.tester_agent import TesterAgent
 from src.agents.devops_agent import DevOpsAgent
@@ -15,12 +16,33 @@ from src.agents.summarizer_agent import SummarizerAgent
 
 def run_cli(requirement):
     orchestrator = Orchestrator()
+    orchestrator.register_agent(TaskAgent())
     orchestrator.register_agent(EngineerAgent())
     orchestrator.register_agent(TesterAgent())
     orchestrator.register_agent(DevOpsAgent())
     orchestrator.register_agent(SummarizerAgent())
     
-    orchestrator.run_pipeline(requirement)
+    state = orchestrator.run_pipeline(requirement)
+    
+    print("\n" + "="*50)
+    print("EXECUTION REPORT")
+    print("="*50)
+    print(f"Status: {state.status.name}")
+    
+    code = state.context.get("generated_code", "No code generated.")
+    tests = state.context.get("tests", "No tests generated.")
+    
+    print("\n[GENERATED CODE]")
+    if isinstance(code, dict):
+        for filepath, content in code.items():
+            print(f"\n--- {filepath} ---")
+            print(content)
+    else:
+        print(code)
+    
+    print("\n[GENERATED TESTS]")
+    print(tests)
+    print("="*50 + "\n")
 
 def start_api():
     # Use 'src.interface.api_server:app' which requires 'src' in path (added above)

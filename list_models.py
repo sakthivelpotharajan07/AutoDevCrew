@@ -1,17 +1,21 @@
-import google.generativeai as genai
+import os
+from groq import Groq
 from src.core.utils import load_config
-import sys
-
-# Force UTF-8 stdout
-sys.stdout.reconfigure(encoding='utf-8')
 
 try:
     config = load_config()
     api_key = config["llm"].get("api_key")
-    genai.configure(api_key=api_key)
+    
+    if not api_key:
+        print("Error: No API key found in config")
+        exit(1)
 
-    for m in genai.list_models():
-        if 'generateContent' in m.supported_generation_methods:
-             print(m.name)
+    client = Groq(api_key=api_key)
+    models = client.models.list()
+    
+    print("\nAvailable Groq Models:")
+    for model in models.data:
+        print(f"- {model.id}")
+        
 except Exception as e:
     print(f"Error: {e}")

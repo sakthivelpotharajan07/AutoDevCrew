@@ -1,12 +1,13 @@
 transformers
 torch
 chromadb
-google-generativeai
 sentence-transformers
 fastapi
-uvicorn
 streamlit
+streamlit-monaco
 pytest
 pyyaml
 accelerate
 bitsandbytes
+google-genai
+pyngrok

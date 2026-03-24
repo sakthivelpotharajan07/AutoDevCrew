@@ -1,6 +1,7 @@
 import torch
 from transformers import pipeline
-import google.generativeai as genai
+import warnings
+from google import genai
 from src.core.utils import load_config, setup_logging
 import os
 
@@ -10,17 +11,19 @@ class LLMEngine:
     def __init__(self):
         self.config = load_config()
         self.pipe = None
-        self.genai_model = None
+        self.genai_client = None
         self.provider = self.config["llm"].get("provider", "local")
 
     def load_model(self):
         if self.provider == "gemini":
             self._load_gemini()
+        elif self.provider == "groq":
+            self._load_groq()
         else:
             self._load_local()
 
     def _load_gemini(self):
-        if self.genai_model:
+        if self.genai_client:
             return
 
         api_key = self.config["llm"].get("api_key")
@@ -34,15 +37,31 @@ class LLMEngine:
             return
 
         try:
-            genai.configure(api_key=api_key)
-            model_name = self.config["llm"].get("model_id", "gemini-1.5-flash")
-            self.genai_model = genai.GenerativeModel(model_name)
-            logger.info("Gemini model loaded successfully.")
-            print("DEBUG: Gemini model loaded.")
+            self.genai_client = genai.Client(api_key=api_key)
+            self.gemini_model_name = self.config["llm"].get("model_id", "gemini-1.5-flash")
+            logger.info("Gemini client loaded successfully.")
+            print("DEBUG: Gemini client loaded.")
         except Exception as e:
              logger.error(f"Failed to load Gemini: {e}")
              print(f"DEBUG: Failed to load Gemini: {e}")
 
+    def _load_groq(self):
+        if hasattr(self, 'groq_client') and self.groq_client:
+            return
+
+        api_key = self.config["llm"].get("api_key")
+        if not api_key:
+            logger.error("Groq API key not found.")
+            return
+
+        try:
+            from groq import Groq
+            self.groq_client = Groq(api_key=api_key)
+            logger.info("Groq client loaded successfully.")
+        except ImportError:
+            logger.error("groq package not found. Please pip install groq")
+        except Exception as e:
+            logger.error(f"Failed to load Groq: {e}")
 
     def _load_local(self):
         if self.pipe:
@@ -70,24 +89,52 @@ class LLMEngine:
     def generate(self, prompt: str, max_new_tokens=256):
         if self.provider == "gemini":
             return self._generate_gemini(prompt)
+        elif self.provider == "groq":
+            return self._generate_groq(prompt)
         else:
             return self._generate_local(prompt, max_new_tokens)
 
     def _generate_gemini(self, prompt: str):
-        if not self.genai_model:
+        if not self.genai_client:
             self.load_model()
         
-        if not self.genai_model:
-            return "Error: Gemini model not loaded (check API key)."
+        if not self.genai_client:
+            return "Error: Gemini client not loaded (check API key)."
 
         try:
             print("DEBUG: Sending request to Gemini...")
-            response = self.genai_model.generate_content(prompt)
+            response = self.genai_client.models.generate_content(
+                model=self.gemini_model_name,
+                contents=prompt
+            )
             print("DEBUG: Gemini response received.")
             return response.text
         except Exception as e:
              logger.error(f"Gemini generation error: {e}")
              return f"Error calling Gemini: {e}"
+
+    def _generate_groq(self, prompt: str):
+        if not hasattr(self, 'groq_client') or not self.groq_client:
+            self.load_model()
+        
+        if not hasattr(self, 'groq_client') or not self.groq_client:
+            return "Error: Groq client not loaded."
+
+        try:
+            model_id = self.config["llm"].get("model_id", "mixtral-8x7b-32768")
+            chat_completion = self.groq_client.chat.completions.create(
+                messages=[
+                    {
+                        "role": "user",
+                        "content": prompt,
+                    }
+                ],
+                model=model_id,
+            )
+            return chat_completion.choices[0].message.content
+        except Exception as e:
+            logger.error(f"Groq generation error: {e}")
+            return f"Error calling Groq: {e}"
 
     def _generate_local(self, prompt: str, max_new_tokens=256):
         print("DEBUG: Local Generate request received.")

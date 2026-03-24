@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1>Cake List</h1>
+    <ul>
+    {% for cake in cakes %}
+        <li>
+            {{ cake.name }} ({{ cake.flavor }})
+            <a href="{{ url_for('cake_details', cake_id=cake.id) }}">Details</a>
+        </li>
+    {% endfor %}
+    </ul>
+    <p><a href="{{ url_for('create_cake') }}">Create New Cake</a></p>
+{% endblock %}

@@ -1,0 +1,32 @@
+<html>
+    <body>
+        <h1>Users Page</h1>
+        <table border="1">
+            <tr>
+                <th>User ID</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Orders</th>
+            </tr>
+            {% for user in users %}
+            <tr>
+                <td>{{ user.id }}</td>
+                <td>{{ user.name }}</td>
+                <td>{{ user.email }}</td>
+                <td>
+                    <ul>
+                        {% for order in user.orders %}
+                        <li>
+                            Order ID: {{ order.id }} - 
+                            Cake: {{ order.cake.name }} - 
+                            Quantity: {{ order.quantity }} - 
+                            Date: {{ order.date }}
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+    </body>
+</html>

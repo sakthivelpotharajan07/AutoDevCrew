@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <h1>Cakes</h1>
+  <ul>
+    {% for cake in cakes %}
+      <li>
+        {{ cake.name }} ({{ cake.price }})
+        <form action="{{ url_for('order', cake_id=cake.id) }}" method="post">
+          <input type="number" name="quantity" value="1" />
+          <input type="submit" value="Order" />
+        </form>
+      </li>
+    {% endfor %}
+  </ul>
+{% endblock %}

@@ -3,15 +3,29 @@ import requests
 import json
 import time
 
+import sys
+from pathlib import Path
+
+# Add project root to sys.path
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.append(str(PROJECT_ROOT))
+
+# Import local modules
+from src.interface.editor_app import render_editor
+
 st.set_page_config(page_title="AutoDevCrew Dashboard", layout="wide")
 
 st.title("🚀 AutoDevCrew Control Center")
 st.sidebar.title("Navigation")
-page = st.sidebar.radio("Go to", ["Pipeline", "Memory Explorer", "Settings"])
+page = st.sidebar.radio("Go to", ["Pipeline", "Code Editor", "Memory Explorer", "Settings"])
 
 API_URL = "http://localhost:8000"
 
-if page == "Pipeline":
+if page == "Code Editor":
+    render_editor()
+    
+elif page == "Pipeline":
     st.header("Run Development Pipeline")
     requirement = st.text_area("Enter Requirement:", height=150)
     
@@ -36,10 +50,29 @@ if page == "Pipeline":
                         if 'generated_code' not in data['context']:
                              st.warning("No code generated. Logic returned: " + str(data))
                         
-                        st.code(data['context'].get('generated_code', 'No code'))
+                        live_url = data['context'].get('live_url')
+                        if live_url:
+                            st.write("---")
+                            st.write("### 🌐 Live URL")
+                            st.markdown(f"[{live_url}]({live_url})")
+                            st.write("### 🚀 Running Application")
+                            import streamlit.components.v1 as components
+                            components.iframe(live_url, height=600)
+                            st.write("---")
+                        
+                        gen_code = data['context'].get('generated_code', 'No code')
+                        st.session_state.generated_code = gen_code  # Store for Editor
+                        
+                        if isinstance(gen_code, dict):
+                            for filepath, content in gen_code.items():
+                                st.write(f"**{filepath}**")
+                                st.code(content, language="python")
+                        else:
+                            st.code(gen_code)
                         
                         st.subheader("Generated Tests")
                         st.code(data['context'].get('tests', 'No tests'))
+                        st.success("Code available in 'Code Editor' tab!")
                     else:
                         st.error(f"Error: {response.text}")
                 except requests.exceptions.Timeout:
