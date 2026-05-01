@@ -1,19 +1,39 @@
-Python 
+from fastapi import APIRouter, Depends, HTTPException
+from fastapi.security import HTTPBasic, HTTPBasicCredentials
+from fastapi.responses import JSONResponse
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy import Column, String
+from pydantic import BaseModel
+from typing import Optional
 
-from django.shortcuts import render, redirect
-from django.contrib.auth import authenticate, login
-from .forms import LoginForm
+SQLALCHEMY_DATABASE_URL = "sqlite:///users.db"
 
-def login_page(request):
-    if request.method == 'POST':
-        form = LoginForm(request.POST)
-        if form.is_valid():
-            username = form.cleaned_data.get('username')
-            password = form.cleaned_data.get('password')
-            user = authenticate(username=username, password=password)
-            if user is not None:
-                login(request, user)
-                return redirect('home')
-    else:
-        form = LoginForm()
-    return render(request, 'login.html', {'form': form})
+engine = create_engine(SQLALCHEMY_DATABASE_URL)
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
+Base = declarative_base()
+
+class User(Base):
+    __tablename__ = "users"
+    username = Column(String, primary_key=True)
+    password = Column(String)
+
+Base.metadata.create_all(bind=engine)
+
+router = APIRouter()
+
+security = HTTPBasic()
+
+class UserCredentials(BaseModel):
+    username: str
+    password: str
+
+@router.post("/login")
+async def login(credentials: UserCredentials):
+    db = SessionLocal()
+    user = db.query(User).filter(User.username == credentials.username).first()
+    if user is None or user.password != credentials.password:
+        raise HTTPException(status_code=401, detail="Invalid username or password")
+    return JSONResponse(content={"message": "Login successful"}, status_code=200)

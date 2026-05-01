@@ -7,10 +7,12 @@ PROJECT_ROOT = Path(__file__).resolve().parents[2]
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.append(str(PROJECT_ROOT))
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, BackgroundTasks
+from fastapi.responses import HTMLResponse
 from pydantic import BaseModel
 from contextlib import asynccontextmanager
 from src.core.orchestrator import Orchestrator
+from src.core.state import PipelineStatus
 from src.agents.task_agent import TaskAgent
 from src.agents.engineer_agent import EngineerAgent
 from src.agents.tester_agent import TesterAgent
@@ -44,24 +46,46 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(title="AutoDevCrew API", description="API for Multi-Agent DevOps System", lifespan=lifespan)
 
+@app.get("/", response_class=HTMLResponse)
+def root():
+    html_file = PROJECT_ROOT / "login_page.html"
+    if html_file.exists():
+        return html_file.read_text(encoding="utf-8")
+    return "<h1>AutoDevCrew Backend is Running</h1><p>No login_page.html found.</p>"
 class PipelineRequest(BaseModel):
     requirement: str
 
 @app.post("/run_pipeline")
-def run_pipeline(request: PipelineRequest):
+def run_pipeline(request: PipelineRequest, background_tasks: BackgroundTasks):
     if not orchestrator:
         raise HTTPException(status_code=503, detail="System not initialized")
         
     try:
-        # Normalize/Init LLM if not ready (it handles its own lazy loading now)
-        state = orchestrator.run_pipeline(request.requirement)
-        return {
-            "status": state.status.name, 
-            "context": state.context,
-            "errors": state.errors
-        }
+        # Reset state for a new run
+        orchestrator.state.status = PipelineStatus.IDLE
+        orchestrator.state.current_step = "Initializing..."
+        orchestrator.state.context = {}
+        orchestrator.state.errors = []
+        orchestrator.state.memory_context = []
+        
+        # Add the pipeline execution to background tasks
+        background_tasks.add_task(orchestrator.run_pipeline, request.requirement)
+        
+        return {"status": "STARTED"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/pipeline_status")
+def pipeline_status():
+    if not orchestrator:
+        raise HTTPException(status_code=503, detail="System not initialized")
+    
+    return {
+        "status": orchestrator.state.status.name,
+        "current_step": orchestrator.state.current_step,
+        "context": orchestrator.state.context,
+        "errors": orchestrator.state.errors
+    }
 
 @app.get("/memory/search")
 def search_memory(q: str):

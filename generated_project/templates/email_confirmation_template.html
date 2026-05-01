@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f2f2f2;
+        }
+        
+        .container {
+            width: 80%;
+            margin: 40px auto;
+            background-color: #ffffff;
+            padding: 20px;
+            border: 1px solid #ddd;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .header {
+            background-color: #2ecc71;
+            color: #ffffff;
+            padding: 10px;
+            text-align: center;
+        }
+        
+        .content {
+            padding: 20px;
+        }
+        
+        .footer {
+            background-color: #2ecc71;
+            color: #ffffff;
+            padding: 10px;
+            text-align: center;
+            clear: both;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h2>Job Application Submission Confirmation</h2>
+        </div>
+        <div class="content">
+            <p>Hello {{ applicant.name }},</p>
+            <p>
+                Thank you for submitting your job application for the {{ job.title }} position at {{ company.name }}. Your application has been received and will be reviewed by our team.
+            </p>
+            <p>
+                Please find a summary of your application below:
+            </p>
+            <ul>
+                <li>Name: {{ applicant.name }}</li>
+                <li>Email: {{ applicant.email }}</li>
+                <li>Phone: {{ applicant.phone }}</li>
+                <li>Cover Letter: {{ applicant.cover_letter }}</li>
+                <li>CV: {{ applicant.cv }}</li>
+                <li>Job Title: {{ job.title }}</li>
+                <li>Company Name: {{ company.name }}</li>
+            </ul>
+            <p>
+                We will be in touch with you shortly to discuss your application. Thank you again for your interest in joining our team.
+            </p>
+        </div>
+        <div class="footer">
+            <p>
+                If you have any questions or concerns, please do not hesitate to contact us at <a href="mailto:info@{{ company.email }}">{{ company.email }}</a>.
+            </p>
+            <p>Best regards,</p>
+            <p>{{ company.name }} Team</p>
+        </div>
+    </div>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            // Add your inline JavaScript code here...
+        });
+    </script>
+</body>
+</html>

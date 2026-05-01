@@ -1,0 +1,17 @@
+fastapi
+python
+uvicorn
+sqlalchemy
+sqlalchemy-utils
+python-multipart
+pandas
+numpy
+python-jose
+cryptography
+passlib
+pydantic
+python-dotenv
+python-decouple
+pipelinewise-talavera
+pipelines-pandas-sqlite 
+pipelinewise-azure-data-factory

@@ -99,24 +99,25 @@ def render_editor():
             height=600
         )
 
-        # ---------- Buttons ----------
+        # ---------- Sleek Action Bar ----------
+        st.markdown("<br>", unsafe_allow_html=True)
+        st.markdown("### 🛠️ Editor Actions")
+        
+        # Use full-width columns for action buttons
         col1, col2, col3, col4 = st.columns(4)
 
         with col1:
             if is_generated:
-                # For generated code, always allow saving as a new file
-                with st.popover("💾 Save to File"):
-                    st.markdown("### Save Generated Code")
-                    
+                with st.popover("💾 Save Snippet", use_container_width=True):
+                    st.markdown("**Deploy to Workspace**")
                     default_path = "src/generated_script.py"
                     if selected_file.startswith("✨ Generated: "):
                         default_path = selected_file.replace("✨ Generated: ", "")
                         
-                    new_filename = st.text_input("Destination Path:", value=default_path)
-                    if st.button("Confirm Save"):
+                    new_filename = st.text_input("Target Filepath", value=default_path)
+                    if st.button("Commit Code"):
                         try:
                             save_path = PROJECT_ROOT / new_filename
-                            # Ensure directory exists
                             save_path.parent.mkdir(parents=True, exist_ok=True)
                             
                             content_to_save = edited_code if edited_code else st.session_state.editor_code
@@ -124,44 +125,26 @@ def render_editor():
                                 content_to_save = str(content_to_save)
                                 
                             save_path.write_text(content_to_save, encoding="utf-8")
-                            st.success(f"Saved to {new_filename}")
-                            # We might want to switch the selection to the new file, but for now just notify
-                            time.sleep(1) # Give user time to see success
+                            st.success(f"Deployed ✅")
+                            time.sleep(1)
                             st.rerun() 
                         except Exception as e:
-                            st.error(f"Failed to save: {e}")
+                            st.error(f"Save Failed: {e}")
             else:
-                # Existing file
-                if st.button("💾 Save File"):
+                if st.button("💾 Overwrite File", use_container_width=True):
                     try:
                         content_to_save = edited_code if edited_code else st.session_state.editor_code
                         file_map[selected_file].write_text(content_to_save, encoding="utf-8")
-                        st.success(f"File saved: {selected_file}")
+                        st.success(f"Overwritten ✅")
                     except Exception as e:
-                        st.error(f"Failed to save: {e}")
+                        st.error(f"Save Failed: {e}")
                 
-                # option to save as
-                with st.popover("Save As..."):
-                     st.markdown("### Save Copy")
-                     new_filename = st.text_input("New Filename:", value=f"copy_{Path(selected_file).name}")
-                     if st.button("Save Copy"):
-                        try:
-                            save_path = PROJECT_ROOT / new_filename
-                            save_path.parent.mkdir(parents=True, exist_ok=True)
-                            content_to_save = edited_code if edited_code else st.session_state.editor_code
-                            save_path.write_text(content_to_save, encoding="utf-8")
-                            st.success(f"Saved copy to {new_filename}")
-                            time.sleep(1)
-                            st.rerun()
-                        except Exception as e:
-                             st.error(f"Failed to save: {e}")
-
         with col2:
-            if st.button("▶️ Run Code"):
+            if st.button("▶️ Execute Script", use_container_width=True):
                 if not edited_code and not code_content:
-                    st.warning("No code to run.")
+                    st.warning("Workspace empty.")
                 else:
-                    with st.spinner("Running code..."):
+                    with st.spinner("Compiling & Running..."):
                         import subprocess
                         import tempfile
                         
@@ -169,16 +152,13 @@ def render_editor():
                         if isinstance(code_to_run, dict):
                             code_to_run = str(code_to_run)
                         
-                        # Fix: Determine execution directory so relative imports work
                         exec_dir = PROJECT_ROOT / "generated_project"
                         exec_dir.mkdir(parents=True, exist_ok=True)
                         
-                        # Fix: Check dependencies before execution
                         req_path = exec_dir / "requirements.txt"
                         if req_path.exists():
-                           subprocess.run([sys.executable, "-m", "pip", "install", "-r", str(req_path)], cwd=str(exec_dir))
+                           subprocess.run([sys.executable, "-m", "pip", "install", "-q", "-r", str(req_path)], cwd=str(exec_dir))
                         
-                        # Try to use original filename if known to preserve module logic, else default tmp.
                         filename = "run_temp.py"
                         if st.session_state.get('current_file') and not st.session_state.get('current_file').startswith("✨"):
                             filename = Path(st.session_state.current_file).name
@@ -188,10 +168,11 @@ def render_editor():
                         tmp_path = exec_dir / f"tmp_{filename}"
                         
                         try:
+                            tmp_path.parent.mkdir(parents=True, exist_ok=True)
                             tmp_path.write_text(code_to_run, encoding="utf-8")
                             
                             if tmp_path.suffix != ".py":
-                                st.session_state.terminal_output = f"File {filename} is a static or non-Python file and cannot be executed natively."
+                                st.session_state.terminal_output = f"Warning: {filename} is a non-Python component and lacks a direct execution context."
                                 st.session_state.terminal_error = ""
                                 st.session_state.exec_time = "0.0s"
                                 st.session_state.exit_code = 0
@@ -199,13 +180,12 @@ def render_editor():
                                 env = os.environ.copy()
                                 env["PYTHONPATH"] = str(exec_dir)
                                 
-                                # Run the script and capture output
                                 start_time = time.time()
                                 result = subprocess.run(
                                     [sys.executable, str(tmp_path)],
                                     capture_output=True,
                                     text=True,
-                                    timeout=30, # 30 second timeout max
+                                    timeout=30,
                                     cwd=str(exec_dir),
                                     env=env
                                 )
@@ -222,66 +202,68 @@ def render_editor():
                             st.session_state.exit_code = -1
                         except Exception as e:
                            st.session_state.terminal_output = ""
-                           st.session_state.terminal_error = f"Error launching process: {e}"
+                           st.session_state.terminal_error = f"Runtime Crash: {e}"
                            st.session_state.exec_time = "N/A"
                            st.session_state.exit_code = -1
                         finally:
-                            # Clean up the temp file
                             try:
                                 if tmp_path.exists():
                                     tmp_path.unlink()
                             except:
                                 pass
                                 
-        # Terminal Output Area
-        st.markdown("---")
-        st.markdown("### 🖥️ Terminal Output")
+        with col3:
+            if st.button("🐳 Build Docker Image", use_container_width=True):
+                try:
+                    result1 = generate_requirements("generated_project", "fastapi")
+                    result2 = generate_dockerfile("generated_project", "fastapi")
+                    st.toast(result1, icon="🐳")
+                    st.toast(result2, icon="🐳")
+                except Exception as e:
+                    st.error(f"Build Failed: {e}")
+
+        with col4:
+            if st.button("🚀 Commit to GitHub", use_container_width=True):
+                result = push_to_github("generated_project", "autodevcrew-demo-build")
+                if "Error" in result:
+                     st.error(result)
+                else:
+                     st.toast("Pushed remote branch successfully!", icon="🐙")
+
+        # ---------- Terminal Emulation ----------
+        st.markdown("<br><br>", unsafe_allow_html=True)
+        st.markdown("### 🖥️ Native Output Console")
+        st.caption("Standard Output (STDOUT) and Standard Error (STDERR) streams.")
         
-        # Determine styling and content based on state
         term_out = st.session_state.get("terminal_output", "")
         term_err = st.session_state.get("terminal_error", "")
         exec_time = st.session_state.get("exec_time", "")
         exit_code = st.session_state.get("exit_code", None)
         
+        # Display runtime metrics
         if exit_code is not None:
             if exit_code == 0:
-                st.success(f"Execution finished in {exec_time}")
+                st.success(f"Engine Detached • Time: {exec_time} • Status: 0 (OK)")
             else:
-                st.error(f"Execution failed with exit code {exit_code} in {exec_time}")
+                st.error(f"Engine Crash • Time: {exec_time} • Status: {exit_code} (FAIL)")
                 
-        # Use a disabled text area to simulate a terminal pane
-        combined_output = "No output yet."
-        if term_out or term_err:
-            combined_output = ""
-            if term_out:
-                combined_output += f"--- STDOUT ---\n{term_out}\n"
-            if term_err:
-                combined_output += f"--- STDERR ---\n{term_err}\n"
-                
-        st.code(combined_output, language="bash")
-        with col3:
-            if st.button("🐳 Generate Docker"):
-                try:
-                    result1 = generate_requirements("generated_project", "fastapi")
-                    result2 = generate_dockerfile("generated_project", "fastapi")
-                    st.success(result1)
-                    st.success(result2)
-                except Exception as e:
-                    st.error(f"Docker generation failed: {e}")
-
-        with col4:
-            if st.button("🚀 Push to GitHub"):
-                # You might want to make 'repo_name' dynamic or input based
-                # For now using a hardcoded default or user input could optionally be added
-                result = push_to_github("generated_project", "login-system-demo")
-                if "Error" in result:
-                     st.error(result)
-                else:
-                     st.success(result)
+        # Consolidated pseudo-terminal wrapper
+        terminal_wrap = f"""
+```bash
+# user@autodevcrew:~/workspace/generated_project$ python script.py
+"""
+        if not term_out and not term_err:
+            terminal_wrap += "\n[No stdout or stderr output recorded]"
+        if term_out:
+            terminal_wrap += f"\n{term_out}"
+        if term_err:
+            terminal_wrap += f"\n[stderr]\n{term_err}"
+            
+        terminal_wrap += "\n```"
+        st.markdown(terminal_wrap)
 
     else:
-        st.info("Please select a file from the sidebar to start editing.")
+        st.info("⬅️ Initialize your environment by selecting a source file from the project directory.")
 
 if __name__ == "__main__":
-    st.set_page_config(page_title="AutoDevCrew Editor", layout="wide")
     render_editor()

@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 20px;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .header {
+            background-color: #333;
+            color: #fff;
+            padding: 10px;
+            border-bottom: 1px solid #333;
+        }
+        .header h1 {
+            margin: 0;
+        }
+        .search-bar {
+            padding: 10px;
+            border-bottom: 1px solid #ccc;
+        }
+        .search-bar input {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+        }
+        .weather-info {
+            padding: 20px;
+        }
+        .weather-info h2 {
+            margin-top: 0;
+        }
+        .weather-icon {
+            width: 50px;
+            height: 50px;
+            margin: 10px;
+        }
+        .weather-details {
+            margin-top: 20px;
+        }
+        .weather-details ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .weather-details li {
+            margin-bottom: 10px;
+        }
+        .weather-details li span {
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Weather Dashboard</h1>
+        </div>
+        <div class="search-bar">
+            <input id="search-input" type="text" placeholder="Search for a city or zip code">
+            <button id="search-button">Search</button>
+        </div>
+        <div class="weather-info">
+            <h2 id="city-name"></h2>
+            <img id="weather-icon" class="weather-icon" src="">
+            <div class="weather-details">
+                <ul>
+                    <li>Temperature: <span id="temperature"></span></li>
+                    <li>Humidity: <span id="humidity"></span></li>
+                    <li>Wind Speed: <span id="wind-speed"></span></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <script>
+        const searchButton = document.getElementById('search-button');
+        const searchInput = document.getElementById('search-input');
+        const cityNameElement = document.getElementById('city-name');
+        const weatherIconElement = document.getElementById('weather-icon');
+        const temperatureElement = document.getElementById('temperature');
+        const humidityElement = document.getElementById('humidity');
+        const windSpeedElement = document.getElementById('wind-speed');
+
+        searchButton.addEventListener('click', async () => {
+            const city = searchInput.value.trim();
+            if (city) {
+                try {
+                    const response = await fetch(`http://localhost:8000/weather/${city}`);
+                    const data = await response.json();
+                    const weatherData = data.weather[0];
+                    cityNameElement.textContent = data.name;
+                    weatherIconElement.src = `http://openweathermap.org/img/wn/${weatherData.icon}@2x.png`;
+                    temperatureElement.textContent = `${data.main.temp}°C`;
+                    humidityElement.textContent = `${data.main.humidity}%`;
+                    windSpeedElement.textContent = `${data.wind.speed} m/s`;
+                } catch (error) {
+                    console.error(error);
+                }
+            }
+        });
+    </script>
+</body>
+</html>

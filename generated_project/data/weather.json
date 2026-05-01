@@ -1,0 +1,29 @@
+{
+  "location": "London",
+  "weather_data": [
+    {
+      "date": "2024-04-01",
+      "temperature": 12,
+      "humidity": 60,
+      "description": "Cloudy"
+    },
+    {
+      "date": "2024-04-02",
+      "temperature": 15,
+      "humidity": 50,
+      "description": "Sunny"
+    },
+    {
+      "date": "2024-04-03",
+      "temperature": 18,
+      "humidity": 40,
+      "description": "Partly cloudy"
+    },
+    {
+      "date": "2024-04-04",
+      "temperature": 12,
+      "humidity": 60,
+      "description": "Cloudy"
+    }
+  ]
+}

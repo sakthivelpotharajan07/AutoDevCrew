@@ -6,24 +6,53 @@ class TaskAgent(Agent):
         super().__init__("TaskAgent")
 
     def run(self):
-        print(f"[{self.name}] Analyzing requirement to determine file structure...")
+        print(f"[{self.name}] Classifying project and determining file structure...")
         requirement = self.orchestrator.state.context.get("requirement", "")
         
         if not requirement:
             print(f"[{self.name}] No requirement found in context.")
             return
 
-        prompt = f"""You are an expert software architect.
+        # Simple string-based heuristics to suggest framework, backend type
+        req_lower = requirement.lower()
+        framework = "flask" if "flask" in req_lower else "fastapi"
+        
+        project_type = "static"
+        if any(w in req_lower for w in ["login", "auth", "register", "signup"]):
+            project_type = "auth"
+        elif any(w in req_lower for w in ["form", "submit", "application"]):
+            project_type = "form"
+        elif any(w in req_lower for w in ["dashboard", "stock", "chart", "analytics"]):
+            project_type = "dashboard"
+            
+        self.orchestrator.state.update_context("project_type", project_type)
+        self.orchestrator.state.update_context("framework", framework)
+        
+        print(f"[{self.name}] Detected Project Type: {project_type.upper()} | Framework: {framework.upper()}")
+
+        prompt = f"""You are an expert full-stack software architect.
         User Requirement: "{requirement}"
+        Target Framework: {framework.capitalize()}
+        Project Type: {project_type.capitalize()}
         
         Determine the exact file structure required to implement this requirement.
+        
+        CRITICAL RULES:
+        1. As a full-stack {framework.capitalize()} application, you MUST include:
+           - A backend entry point. For FastAPI, name it `main.py`. For Flask, name it `app.py`.
+           - EXACTLY ONE frontend HTML file. 
+             - If using FastAPI, name it `index.html` (or `login.html`).
+             - If using Flask, you MUST place it in a `templates/` folder (e.g., `templates/index.html`).
+           - All CSS and JS MUST be inline within the HTML file. DO NOT generate separate `.css` or `.js` files.
+           - A `requirements.txt` file containing the framework name ({framework}) and any other required libraries (e.g., sqlalchemy).
+        2. Keep the architecture simple, avoiding unnecessary nesting.
         
         Return ONLY a JSON array of objects, where each object has 'path' and 'description'.
         For example:
         [
-            {{"path": "src/main.py", "description": "Entry point of the application"}},
-            {{"path": "src/utils.py", "description": "Helper functions"}},
-            {{"path": "tests/test_main.py", "description": "Tests for the main application"}}
+            {{"path": "app.py", "description": "Flask backend entry point serving the HTML"}},
+            {{"path": "templates/index.html", "description": "The main frontend HTML file"}},
+            {{"path": "requirements.txt", "description": "{framework}, etc."}}
         ]
         
         Do not include any explanation or markdown formatting (like ```json).
@@ -36,8 +65,23 @@ class TaskAgent(Agent):
         # Parse the response
         file_structure = self._parse_response(response)
         
+        # Inject database.py and models.py if auth/login/form is detected OR if the LLM decided they were necessary
+        heuristic_needs_db = project_type in ["auth", "form"]
+        ai_generated_db = any("database.py" in f.get("path", "") or "models.py" in f.get("path", "") for f in file_structure)
+        needs_db = heuristic_needs_db or ai_generated_db
+        
         # Rule-based requirements mapping
         dependencies = self._extract_requirements(requirement)
+        if framework not in dependencies:
+            dependencies.add(framework)
+            if framework == "fastapi":
+                dependencies.add("uvicorn")
+                
+        if needs_db:
+            dependencies.add("sqlalchemy")
+            if framework == "fastapi":
+                dependencies.add("python-multipart")
+                
         if dependencies:
             req_content = "\n".join(sorted(list(dependencies)))
             self.orchestrator.state.update_context("rule_based_requirements", req_content)
@@ -49,9 +93,6 @@ class TaskAgent(Agent):
                     "description": "Project dependencies generated via rule-based mapping"
                 })
                 
-        # Inject database.py and models.py if auth/login is detected
-        req_lower = requirement.lower()
-        needs_db = any(w in req_lower for w in ["login", "database", "auth", "register", "signup"])
         if needs_db:
             if not any("database.py" in f.get("path", "") for f in file_structure):
                 file_structure.append({"path": "database.py", "description": "SQLAlchemy SQLite connection setup"})

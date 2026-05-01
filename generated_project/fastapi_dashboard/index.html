@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clothing Shopping Dashboard</title>
+    <style>
+        body {
+            background-image: linear-gradient(to bottom, #455a64, #546e7a);
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 20px;
+            background-color: #ffffff;
+            border: 1px solid #dddddd;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .product {
+            background-color: #f7f7f7;
+            padding: 20px;
+            border: 1px solid #eeeeee;
+            border-radius: 10px;
+            margin: 20px;
+            width: 250px;
+            height: 400px;
+            display: inline-block;
+            margin: 20px;
+            vertical-align: top;
+            overflow: hidden;
+        }
+        .product img {
+            width: 250px;
+            height: 200px;
+            object-fit: cover;
+        }
+        .product-price {
+            color: #666666;
+            font-weight: bold;
+            font-size: 24px;
+            margin-top: 10px;
+        }
+        .product-discount {
+            color: #ff0000;
+            font-size: 18px;
+            font-style: italic;
+            margin-top: -15px;
+        }
+        .addToCart {
+            background-color: #4CAF50;
+            color: #ffffff;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        .addToCart:hover {
+            background-color: #3e8e41;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Welcome to Clothing Shopping Dashboard</h2>
+        <h3>Popular Items:</h3>
+        <div class="products">
+            <div class="product">
+                <img src="https://picsum.photos/200/300" alt="Product Image">
+                <h3>Women's Casual Dress</h3>
+                <p>Short-Sleeved Casual Dress for Women</p>
+                <p class="product-price">$49.99</p>
+                <p class="product-discount">(10% off)</p>
+                <button class="addToCart">Add to Cart</button>
+            </div>
+            <div class="product">
+                <img src="https://picsum.photos/200/301" alt="Product Image">
+                <h3>Men's Casual Shirts</h3>
+                <p>Casual Button-Down Shirts for Men</p>
+                <p class="product-price">$19.99</p>
+                <button class="addToCart">Buy Now</button>
+            </div>
+            <div class="product">
+                <img src="https://picsum.photos/200/302" alt="Product Image">
+                <h3>Women's Denim Jeans</h3>
+                <p>Faded Blue Jeans for Women</p>
+                <p class="product-price">$79.99</p>
+                <p class="product-discount">(20% off)</p>
+                <button class="addToCart">Add to Cart</button>
+            </div>
+        </div>
+    </div>
+    <script>
+        // Get all add to cart buttons
+        const addToCartButtons = document.querySelectorAll('.addToCart');
+        
+        // Add event listener to each button
+        addToCartButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                // Add JavaScript logic here to handle add to cart functionality
+                console.log('Button Clicked');
+            });
+        });
+    </script>
+</body>
+</html>

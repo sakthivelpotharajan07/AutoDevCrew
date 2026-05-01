@@ -1,0 +1,107 @@
+<html>
+<head>
+    <title>Weather Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 20px;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        
+        .header {
+            background-color: #333;
+            color: #fff;
+            padding: 10px;
+            text-align: center;
+            border-bottom: 1px solid #444;
+        }
+        
+        .search-bar {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            width: 50%;
+            font-size: 16px;
+        }
+        
+        .search-button {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        
+        .search-button:hover {
+            background-color: #3e8e41;
+        }
+        
+        .weather-info {
+            padding: 20px;
+            font-size: 18px;
+        }
+        
+        .weather-icon {
+            width: 50px;
+            height: 50px;
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h2>Weather Dashboard</h2>
+        </div>
+        <div>
+            <input type="text" id="location" class="search-bar" placeholder="Enter location">
+            <button id="search-btn" class="search-button">Search</button>
+        </div>
+        <div id="weather-info" class="weather-info"></div>
+    </div>
+    <script>
+        const searchButton = document.getElementById('search-btn');
+        const locationInput = document.getElementById('location');
+        const weatherInfoDiv = document.getElementById('weather-info');
+        
+        searchButton.addEventListener('click', async () => {
+            const location = locationInput.value;
+            if (location) {
+                try {
+                    const response = await fetch(`http://localhost:8000/weather?location=${location}`);
+                    const data = await response.json();
+                    const weatherIcon = data.weather[0].icon;
+                    const weatherDescription = data.weather[0].description;
+                    const temperature = data.main.temp;
+                    const feelsLike = data.main.feels_like;
+                    const humidity = data.main.humidity;
+                    
+                    weatherInfoDiv.innerHTML = `
+                        <img src="http://openweathermap.org/img/wn/${weatherIcon}@2x.png" class="weather-icon">
+                        <p>Location: ${location}</p>
+                        <p>Weather: ${weatherDescription}</p>
+                        <p>Temperature: ${temperature}°C</p>
+                        <p>Feels like: ${feelsLike}°C</p>
+                        <p>Humidity: ${humidity}%</p>
+                    `;
+                } catch (error) {
+                    console.error(error);
+                    weatherInfoDiv.innerHTML = 'Error: Unable to retrieve weather data';
+                }
+            } else {
+                weatherInfoDiv.innerHTML = 'Please enter a location';
+            }
+        });
+    </script>
+</body>
+</html>

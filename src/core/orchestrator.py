@@ -50,25 +50,38 @@ class Orchestrator:
                 # Post-pipeline check (after TesterAgent runs)
                 validation_status = self.state.context.get("validation_status", "UNKNOWN")
                 
-                if validation_status == "PASS":
-                    logger.info("Validation PASSED. Pipeline successful.")
-                    self.state.status = PipelineStatus.SUCCESS
-                    break
-                elif validation_status == "FAIL":
-                    logger.warning("Validation FAILED. Retrying...")
-                    feedback = self.state.context.get("feedback", "No feedback provided.")
-                    logger.info(f"Feedback: {feedback}")
-                    iteration_count += 1
-                else:
-                    # If no valid status, assume linear pass or first run without validation
-                    logger.info("No validation status found. Assuming linear execution complete.")
-                    self.state.status = PipelineStatus.SUCCESS
+                if validation_status == "PASS" or validation_status not in ["PASS", "FAIL"]:
+                    if validation_status == "PASS":
+                        logger.info("Validation PASSED. Pipeline successful.")
+                    else:
+                        logger.info("No validation status found. Assuming linear execution complete.")
+                    
+                    # Instead of setting status to SUCCESS early, update current step
+                    self.state.current_step = "Saving Generated Codes..."
+                    
+                    # --- Save generated files to disk ---
+                    try:
+                        import os
+                        project_dir = "generated_project"
+                        os.makedirs(project_dir, exist_ok=True)
+                        gen_code = self.state.context.get("generated_code", {})
+                        if isinstance(gen_code, dict):
+                            for filepath, content in gen_code.items():
+                                full_path = os.path.join(project_dir, filepath)
+                                os.makedirs(os.path.dirname(full_path), exist_ok=True)
+                                with open(full_path, "w", encoding="utf-8") as f:
+                                    f.write(content)
+                        elif isinstance(gen_code, str):
+                            with open(os.path.join(project_dir, "main.py"), "w", encoding="utf-8") as f:
+                                f.write(gen_code)
+                        logger.info(f"Saved generated code to {project_dir}/")
+                    except Exception as e:
+                        logger.error(f"Failed to save generated code: {e}")
+                    # ------------------------------------
                     
                     # --- Docker Generation Step ---
-                    # Assuming generated project is in specific path, or just use a default "generated_project"
-                    # The prompt suggests: generate_requirements(project_path="generated_project", framework="fastapi")
-                    # We might need to detect framework dynamically, but for now we follow the prompt.
                     try:
+                        self.state.current_step = "Generating Docker and Req files..."
                         req_msg = generate_requirements(project_path="generated_project", framework="fastapi")
                         docker_msg = generate_dockerfile(project_path="generated_project", framework="fastapi")
                         logger.info(req_msg)
@@ -79,6 +92,7 @@ class Orchestrator:
                     
                     # --- Live Demo Link ---
                     try:
+                        self.state.current_step = "Deploying Live Application..."
                         logger.info("Starting auto-runner to install dependencies and deploy...")
                         live_url = run_and_deploy()
                         self.state.update_context("live_url", live_url)
@@ -87,11 +101,22 @@ class Orchestrator:
                         logger.error(f"Failed to run and deploy: {e}")
                     # ----------------------
                     
+                    # Mark pipeline as finally SUCCESS after everything including deployment is done
+                    self.state.status = PipelineStatus.SUCCESS
                     break
-            
+                elif validation_status == "FAIL":
+                    logger.warning("Validation FAILED. Retrying...")
+                    feedback = self.state.context.get("feedback", "No feedback provided.")
+                    logger.info(f"Feedback: {feedback}")
+                    iteration_count += 1
+                    
             if iteration_count >= MAX_ITERATIONS:
                 logger.error("Max iterations reached. Pipeline FAILED.")
                 self.state.status = PipelineStatus.FAILED
+                
+                # Retrieve the last feedback to give a descriptive error
+                final_feedback = self.state.context.get("feedback", "No specific feedback.")
+                self.state.errors.append(f"Validation FAILED after 3 attempts. Final feedback: {final_feedback}")
 
             if self.state.status == PipelineStatus.SUCCESS:
                 logger.info("Pipeline completed successfully.")

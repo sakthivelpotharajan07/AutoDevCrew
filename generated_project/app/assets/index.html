@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sports Live Streaming Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+        }
+
+        /* Header Section */
+        header {
+            background-color: #333;
+            color: #fff;
+            padding: 1rem;
+            text-align: center;
+        }
+
+        header h1 {
+            margin: 0;
+        }
+
+        /* Navigation Section */
+        nav {
+            background-color: #333;
+            padding: 1rem;
+        }
+
+        nav ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        nav li {
+            display: inline-block;
+            margin-right: 20px;
+        }
+
+        nav a {
+            color: #fff;
+            text-decoration: none;
+        }
+
+        nav a:hover {
+            color: #ccc;
+        }
+
+        /* Main Content Section */
+        main {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 2rem;
+        }
+
+        main .stream {
+            background-color: #fff;
+            padding: 1rem;
+            border: 1px solid #ddd;
+            width: 80%;
+            margin-bottom: 20px;
+        }
+
+        main .stream iframe {
+            width: 100%;
+            height: 500px;
+        }
+
+        /* Footer Section */
+        footer {
+            background-color: #333;
+            color: #fff;
+            padding: 1rem;
+            text-align: center;
+            clear: both;
+        }
+
+        /* Responsive Design */
+        @media only screen and (max-width: 768px) {
+            nav ul li {
+                display: block;
+                margin-bottom: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Sports Live Streaming Dashboard</h1>
+    </header>
+    <nav>
+        <ul>
+            <li><a href="#">Home</a></li>
+            <li><a href="#">About</a></li>
+            <li><a href="#">Contact</a></li>
+        </ul>
+    </nav>
+    <main>
+        <div class="stream">
+            <h2>Live Streams</h2>
+            <iframe src="https://www.youtube.com/embed/VIDEO_ID" frameborder="0" allowfullscreen></iframe>
+        </div>
+        <div class="stream">
+            <h2>Upcoming Streams</h2>
+            <p>Check back soon for upcoming streams!</p>
+        </div>
+    </main>
+    <footer>
+        <p>&copy; 2023 Sports Live Streaming Dashboard</p>
+    </footer>
+
+    <script>
+        // JavaScript code goes here
+        console.log("Hello World!");
+        let button = document.createElement("button");
+        button.textContent = "Click Me";
+        button.onclick = function() {
+            alert("Button clicked!");
+        };
+        document.body.appendChild(button);
+    </script>
+</body>
+</html>

@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clothe Shopping Dashboard</title>
+    <style>
+        /* Global Styles */
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            width: 100%;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #f0f0f0;
+        }
+
+        /* Header Styles */
+        header {
+            position: absolute;
+            top: 0;
+            width: 100%;
+            background-color: #333;
+            color: #fff;
+            padding: 20px;
+            text-align: center;
+        }
+
+        /* Main Styles */
+        main {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            width: 800px;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Footer Styles */
+        footer {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            background-color: #333;
+            color: #fff;
+            padding: 10px;
+        }
+
+        /* Button Styles */
+        button {
+            padding: 10px 20px;
+            background-color: #333;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #555;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Clothe Shopping Dashboard</h1>
+    </header>
+    <main>
+        <h2>Welcome to the Clothe Shopping Dashboard</h2>
+        <button id="refresh-btn">Refresh</button>
+        <button id="logout-btn">Logout</button>
+        <div id="product-grid">
+            <!-- Product Grid will be rendered dynamically -->
+        </div>
+    </main>
+    <footer>
+        <p>&copy; 2024 Clothe Shopping Dashboard</p>
+    </footer>
+    <script>
+        // Get buttons and product grid elements
+        const refreshBtn = document.getElementById('refresh-btn');
+        const logoutBtn = document.getElementById('logout-btn');
+        const productGrid = document.getElementById('product-grid');
+
+        // Add event listeners
+        refreshBtn.addEventListener('click', refreshGrid);
+        logoutBtn.addEventListener('click', logout);
+
+        // Function to refresh product grid
+        function refreshGrid() {
+            // Make API call to fetch products (Assuming API endpoint is /products)
+            fetch('/products')
+                .then(response => response.json())
+                .then(products => {
+                    // Clear product grid
+                    productGrid.innerHTML = '';
+
+                    // Render product grid dynamically
+                    products.forEach(product => {
+                        const productHTML = `
+                            <div>
+                                <h3>${product.name}</h3>
+                                <p>Price: $${product.price}</p>
+                            </div>
+                        `;
+                        productGrid.insertAdjacentHTML('beforeend', productHTML);
+                    });
+                })
+                .catch(error => console.error(error));
+        }
+
+        // Function to logout
+        function logout() {
+            // Make API call to logout user (Assuming API endpoint is /logout)
+            fetch('/logout')
+                .then(response => response.json())
+                .then(data => {
+                    // Handle logout response
+                    console.log(data);
+                })
+                .catch(error => console.error(error));
+        }
+    </script>
+</body>
+</html>

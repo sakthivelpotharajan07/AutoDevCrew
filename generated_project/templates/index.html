@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shopping Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f2f2f2;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 20px;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .header {
+            background-color: #333;
+            color: #fff;
+            padding: 15px;
+            text-align: center;
+        }
+        .header h1 {
+            margin: 0;
+        }
+        .header button {
+            background-color: #4CAF50;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        .header button:hover {
+            background-color: #3e8e41;
+        }
+        .nav {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .nav li {
+            display: inline-block;
+            margin-right: 20px;
+        }
+        .nav a {
+            color: #333;
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+        .nav a:hover {
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>Shopping Dashboard</h1>
+            <button onclick="location.href='cart'">View Cart</button>
+        </header>
+        <ul class="nav">
+            <li><a href="#">Home</a></li>
+            <li><a href="#">Products</a></li>
+            <li><a href="#">Categories</a></li>
+            <li><a href="#">Brands</a></li>
+        </ul>
+        <main>
+            <h2>Welcome to the Shopping Dashboard</h2>
+            <p>Explore our products, categories, and brands.</p>
+        </main>
+    </div>
+    <script>
+        const products = [
+            { name: 'Product 1', price: 19.99 },
+            { name: 'Product 2', price: 9.99 },
+            { name: 'Product 3', price: 29.99 }
+        ];
+        const productContainer = document.createElement('div');
+        productContainer.className = 'product-list';
+        for (let i = 0; i < products.length; i++) {
+            const product = products[i];
+            const productElement = document.createElement('div');
+            productElement.className = 'product';
+            const productNameElement = document.createElement('h3');
+            productNameElement.textContent = product.name;
+            const productPriceElement = document.createElement('p');
+            productPriceElement.textContent = `Price: $${product.price}`;
+            productElement.appendChild(productNameElement);
+            productElement.appendChild(productPriceElement);
+            productContainer.appendChild(productElement);
+        }
+        const root = document.getElementsByTagName('main')[0];
+        root.appendChild(productContainer);
+
+        function updateCart() {
+            const cartButton = document.querySelector('button');
+            const currentQuantity = parseInt(cartButton.dataset.quantity) || 0;
+            const newQuantity = currentQuantity + 1;
+            cartButton.dataset.quantity = newQuantity.toString();
+            cartButton.textContent = `View Cart (${newQuantity})`;
+        }
+
+        updateCart();
+    </script>
+</body>
+</html>

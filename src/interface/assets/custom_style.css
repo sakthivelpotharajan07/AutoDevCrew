@@ -1,0 +1,187 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+/* Base Font Override */
+html, body, [class*="css"] {
+    font-family: 'Inter', sans-serif !important;
+}
+
+#MainMenu {visibility: hidden;}
+footer {visibility: hidden;}
+
+/* Seamless Dark Glass Header */
+header {
+    background: rgba(11, 13, 23, 0.4) !important;
+    backdrop-filter: blur(12px) !important;
+    -webkit-backdrop-filter: blur(12px) !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+}
+header svg {
+    color: #e2e8f0 !important;
+    stroke: #e2e8f0 !important;
+}
+
+/* Background Ambient Glow & Core Colors */
+.stApp {
+    background: radial-gradient(circle at 15% 20%, rgba(124, 58, 237, 0.12) 0%, transparent 35%),
+                radial-gradient(circle at 85% 85%, rgba(236, 72, 153, 0.12) 0%, transparent 35%),
+                radial-gradient(circle at 50% 50%, rgba(16, 185, 129, 0.05) 0%, transparent 40%),
+                #0b0d17 !important;
+    color: #e2e8f0;
+}
+
+/* Target native Streamlit Bordered Containers (replaces raw HTML divs) */
+[data-testid="stVerticalBlockBorderWrapper"] {
+    background: rgba(22, 25, 43, 0.5) !important;
+    backdrop-filter: blur(16px) !important;
+    -webkit-backdrop-filter: blur(16px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.05) !important;
+    border-radius: 12px !important;
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3) !important;
+    padding: 1.5rem !important;
+    margin-bottom: 1rem !important;
+}
+
+/* Advanced Metrics Styling */
+[data-testid="stMetricValue"] {
+    font-size: 2.2rem !important;
+    font-weight: 800 !important;
+    background: -webkit-linear-gradient(135deg, #38bdf8, #c084fc);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+[data-testid="stMetricLabel"] {
+    color: #cbd5e1 !important;
+    font-weight: 600 !important;
+    font-size: 1rem !important;
+}
+
+/* Progress Bar Bright-Glow Override */
+.stProgress > div > div > div > div {
+    background-image: linear-gradient(90deg, #6366f1, #ec4899) !important;
+    box-shadow: 0 0 10px rgba(236, 72, 153, 0.5);
+}
+
+/* Sidebar Customization */
+[data-testid="stSidebar"] {
+    background-color: #1a1d2d;
+    border-right: 1px solid #2d334a;
+}
+[data-testid="stSidebar"] .css-17lntkn {
+    font-weight: 600;
+}
+
+/* Headers */
+h1, h2, h3 {
+    color: #f8fafc !important;
+    font-weight: 700 !important;
+}
+
+/* --- Optimized Sidebar Navigation --- */
+[data-testid="stSidebar"] div[role="radiogroup"] label div:first-child:not([data-testid="stMarkdownContainer"]) {
+    display: none !important; /* Safely hide radio circle */
+}
+
+[data-testid="stSidebar"] div[role="radiogroup"] label {
+    padding: 0.85rem 1rem;
+    border-radius: 8px;
+    margin-bottom: 0.5rem;
+    background: rgba(255, 255, 255, 0.02);
+    transition: all 0.3s ease;
+    cursor: pointer;
+    width: 100%;
+}
+
+[data-testid="stSidebar"] div[role="radiogroup"] label:hover {
+    background: rgba(255, 255, 255, 0.08);    
+}
+
+/* Bulletproof active-selection styling */
+[data-testid="stSidebar"] div[role="radiogroup"] label:has(input:checked) {
+    background: linear-gradient(90deg, rgba(139, 92, 246, 0.35), transparent) !important;
+    border-left: 4px solid #8b5cf6 !important;
+}
+[data-testid="stSidebar"] div[role="radiogroup"] label:has(input:checked) p {
+    font-weight: 700 !important;
+    color: #ffffff !important;
+}
+
+/* Interactive Element Overrides (Buttons) */
+.stButton > button {
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 0.6rem 1.2rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 14px 0 rgba(99, 102, 241, 0.39);
+}
+
+.stButton > button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(99, 102, 241, 0.5);
+    border: none;
+    color: white;
+}
+
+/* Text Areas and Inputs */
+.stTextArea > div > div > textarea, .stTextInput > div > div > input {
+    background-color: #1e2235 !important;
+    color: #f1f5f9 !important;
+    border-radius: 10px !important;
+    border: 1px solid #334155 !important;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.stTextArea > div > div > textarea:focus, .stTextInput > div > div > input:focus {
+    border-color: #8b5cf6 !important;
+    box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.4) !important;
+}
+
+/* Fix Labels and Placeholders for Clear Visibility */
+.stTextArea label, .stTextInput label, p {
+    color: #f8fafc !important;
+    font-weight: 500 !important;
+}
+
+::placeholder {
+    color: #cbd5e1 !important;
+    opacity: 1 !important;
+}
+
+/* Prevent Button Text Wrapping */
+.stButton > button p {
+    white-space: nowrap !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+/* Live Preview iFrame Glass Container */
+iframe {
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    border: 1px solid #2a2e41;
+}
+
+/* Code Blocks and Terminal Areas */
+pre > code {
+    background-color: #12141e !important;
+    border-radius: 8px !important;
+    border: 1px solid #222639 !important;
+}
+
+/* Expanders */
+.streamlit-expanderHeader {
+    background-color: #1e2235;
+    border-radius: 8px;
+    color: #e2e8f0;
+    font-weight: 600;
+    border: 1px solid #2a2e41;
+}
+.streamlit-expanderContent {
+    background-color: #16192b;
+    border: 1px solid #2a2e41;
+    border-top: none;
+    border-radius: 0 0 8px 8px;
+}

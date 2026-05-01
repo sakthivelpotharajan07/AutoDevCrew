@@ -1,26 +1,49 @@
-from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import Column, Integer, String, Float, DateTime, Enum, ForeignKey
-from sqlalchemy.orm import relationship
-from sqlalchemy.ext.declarative import declarative_base
+Python
+
 from sqlalchemy import create_engine
-from sqlalchemy.pool import StaticPool
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy import Column, String, Integer
+from pydantic import BaseModel
+from typing import Optional
 
-app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///cakes.db'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-db = SQLAlchemy(app)
+SQLALCHEMY_DATABASE_URL = "sqlite:///./sqlalchemy.db"
 
-class Cake(db.Model):
-    id = Column(Integer, primary_key=True)
-    name = Column(String(100), unique=True, nullable=False)
-    price = Column(Float, nullable=False)
-    description = Column(String(200), nullable=False)
-    orders = relationship('Order', backref='cake', lazy=True)
+engine = create_engine(SQLALCHEMY_DATABASE_URL)
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
-class Order(db.Model):
-    id = Column(Integer, primary_key=True)
-    cake_id = Column(Integer, ForeignKey('cake.id'), nullable=False)
-    customer_name = Column(String(100), nullable=False)
-    order_date = Column(DateTime, nullable=False)
-    status = Column(Enum('pending', 'delivered', 'cancelled'), default='pending')
+Base = declarative_base()
+
+class User(Base):
+    __tablename__ = "users"
+    username = Column(String, primary_key=True, index=True)
+    password = Column(String, index=True)
+
+Base.metadata.create_all(bind=engine)
+
+class LoginForm(BaseModel):
+    username: str
+    password: str
+
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+
+def authenticate_user(db, username: str, password: str):
+    user = db.query(User).filter(User.username == username).first()
+    if user and user.password == password:
+        return user
+    return None
+
+def get_user(db, username: str):
+    return db.query(User).filter(User.username == username).first()
+
+def create_user(db, username: str, password: str):
+    user = User(username=username, password=password)
+    db.add(user)
+    db.commit()
+    db.refresh(user)
+    return user

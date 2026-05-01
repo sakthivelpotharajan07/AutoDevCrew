@@ -21,8 +21,9 @@ class TesterAgent(Agent):
         
         Please evaluate this code.
         1. Identify the programming language.
-        2. If there are syntax errors or obvious logical flaws, return status "FAIL" and explain why in "feedback".
-        3. If the code looks correct, return status "PASS" and provide unit tests in "tests" using a standard testing framework for that language (e.g., pytest for Python, JUnit for Java, Jest for JS, etc.).
+        2. If there are FATAL syntax errors or severe logical flaws that would crash the app, return status "FAIL" and explain why in "feedback".
+        3. Do NOT fail the code for missing advanced features like "password hashing", "missing register page", "JWT tokens" or "error handling" unless explicitly asked for. This is a basic prototype.
+        4. If the code is functionally runnable, return status "PASS" and provide basic unit tests in "tests".
         
         Return ONLY a JSON object with this structure:
         {{

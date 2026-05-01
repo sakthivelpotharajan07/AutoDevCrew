@@ -1,24 +1,26 @@
-Python
+Target Language: Python
 
-from flask_sqlalchemy import SQLAlchemy
-from werkzeug.security import generate_password_hash, check_password_hash
+from typing import Optional
+from pydantic import BaseModel, EmailStr
+from datetime import datetime
+from uuid import UUID
 
-db = SQLAlchemy()
+class UserBase(BaseModel):
+    username: str
+    email: EmailStr
 
-class User(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(100), nullable=False)
-    email = db.Column(db.String(100), unique=True, nullable=False)
-    password = db.Column(db.String(128), nullable=False)
-    role = db.Column(db.String(100), nullable=False, default='customer')
+class UserCreate(UserBase):
+    password: str
 
-    def __init__(self, name, email, password, role='customer'):
-        self.name = name
-        self.email = email
-        self.password = generate_password_hash(password)
+class User(UserBase):
+    id: Optional[UUID] = None
+    created_at: Optional[datetime] = None
+    updated_at: Optional[datetime] = None
+    password: Optional[str] = None
+    token: Optional[str] = None
 
-    def check_password(self, password):
-        return check_password_hash(self.password, password)
+    class Config:
+        orm_mode = True
 
-    def __repr__(self):
-        return f"User('{self.name}', '{self.email}', '{self.role}')"
+class UserInDB(User):
+    password: str

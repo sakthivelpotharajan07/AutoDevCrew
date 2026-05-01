@@ -1,17 +1,16 @@
 from django import forms
-from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
-from django.contrib.auth.models import User
+from django.contrib.auth.forms import AuthenticationForm
+from django.core.exceptions import ValidationError
 
 class LoginForm(AuthenticationForm):
-    username = forms.CharField(max_length=255)
-    password = forms.CharField(max_length=255, widget=forms.PasswordInput)
+    username = forms.CharField(max_length=255, label='Username')
+    password = forms.CharField(max_length=255, label='Password', widget=forms.PasswordInput)
 
-class RegisterForm(UserCreationForm):
-    username = forms.CharField(max_length=255)
-    email = forms.EmailField(max_length=255)
-    password1 = forms.CharField(max_length=255, widget=forms.PasswordInput)
-    password2 = forms.CharField(max_length=255, widget=forms.PasswordInput)
+    def clean(self):
+        username = self.cleaned_data.get('username')
+        password = self.cleaned_data.get('password')
 
-    class Meta:
-        model = User
-        fields = ('username', 'email', 'password1', 'password2')
+        if not username or not password:
+            raise ValidationError('Both username and password are required')
+
+        return self.cleaned_data

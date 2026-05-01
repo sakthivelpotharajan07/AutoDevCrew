@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Sports Live Streaming Dashboard</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f0f0;
+        }
+        
+        #container {
+            width: 80%;
+            margin: 20px auto;
+            background-color: #fff;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        #header {
+            background-color: #333;
+            color: #fff;
+            padding: 10px;
+            text-align: center;
+        }
+        
+        #header h1 {
+            margin: 0;
+        }
+        
+        #sidebar {
+            width: 200px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            background-color: #333;
+            padding: 20px;
+            height: 100vh;
+        }
+        
+        #sidebar ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        #sidebar li {
+            padding: 10px;
+            border-bottom: 1px solid #666;
+        }
+        
+        #sidebar a {
+            color: #fff;
+            text-decoration: none;
+        }
+        
+        #content {
+            margin-left: 220px;
+            padding: 20px;
+        }
+        
+        @media (max-width: 768px) {
+            #sidebar {
+                position: relative;
+                width: 100%;
+                height: auto;
+            }
+            #content {
+                margin-left: 0;
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="container">
+        <div id="header">
+            <h1>Sports Live Streaming Dashboard</h1>
+        </div>
+        <div id="sidebar">
+            <ul>
+                <li>
+                    <a href="#">Live Matches</a>
+                </li>
+                <li>
+                    <a href="#">Teams</a>
+                </li>
+                <li>
+                    <a href="#">Players</a>
+                </li>
+            </ul>
+        </div>
+        <div id="content">
+            <h2>Welcome to the Sports Live Streaming Dashboard!</h2>
+            <p>This is a dynamic UI designed for premium live streaming. You can explore various features and enjoy the experience.</p>
+            <script>
+                const sidebar = document.getElementById('sidebar');
+                const content = document.getElementById('content');
+                const header = document.getElementById('header');
+                let isOpen = false;
+
+                function toggleSidebar() {
+                    if (isOpen) {
+                        content.style.marginLeft = '220px';
+                        header.style.top = '0';
+                        sidebar.style.position = 'fixed';
+                        sidebar.style.top = '0';
+                        sidebar.style.left = '0';
+                        sidebar.style.height = '100vh';
+                        isOpen = false;
+                    } else {
+                        content.style.marginLeft = '0';
+                        header.style.top = '20px';
+                        sidebar.style.position = 'relative';
+                        sidebar.style.width = '100%';
+                        sidebar.style.height = 'auto';
+                        isOpen = true;
+                    }
+                }
+
+                const toggleLink = document.getElementById('toggleLink');
+                if (toggleLink) {
+                    toggleLink.addEventListener('click', toggleSidebar);
+                }
+            </script>
+        </div>
+    </div>
+</body>
+</html>

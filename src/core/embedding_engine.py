@@ -1,6 +1,7 @@
+import os
+os.environ["HF_HUB_OFFLINE"] = "1"
 from sentence_transformers import SentenceTransformer
 from src.core.utils import load_config
-
 class EmbeddingEngine:
     def __init__(self):
         config = load_config()

@@ -1,0 +1,29 @@
+import os
+import shutil
+from pathlib import Path
+from fastapi import BackgroundTasks, Response
+from fastapi.responses import JSONResponse
+from main import app
+from static.config import Config
+from typing import List
+
+@app.get("/images/")
+def read_images():
+    config = Config()
+    base_dir = config.IMAGE_DIRECTORY
+    images = os.listdir(base_dir)
+    return {"images": images}
+
+@app.get("/images/{image_id}")
+def read_image(image_id: int):
+    config = Config()
+    base_dir = config.IMAGE_DIRECTORY
+    try:
+        image_path = Path(base_dir, f"image_{image_id}.jpg")
+        if image_path.exists():
+            with open(image_path, "rb") as img:
+                return Response(content=img.read(), media_type="image/jpeg")
+        else:
+            return JSONResponse(status_code=404, content={"message": "Image not found"})
+    except Exception as e:
+        return JSONResponse(status_code=500, content={"message": str(e)})

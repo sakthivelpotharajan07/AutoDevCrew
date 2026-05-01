@@ -1,0 +1,20 @@
+import os
+
+# Create the thumbnails folder if it doesn't exist
+folder_path = 'static/thumbnails'
+
+# Check if the folder exists
+if not os.path.exists(folder_path):
+    # Create the folder
+    os.makedirs(folder_path)
+else:
+    # Clear the existing folder (to be cautious of any existing files)
+    for filename in os.listdir(folder_path):
+        filepath = os.path.join(folder_path, filename)
+        try:
+            if os.path.isfile(filepath):
+                os.unlink(filepath)
+        except Exception as e:
+            print(f'Remove error {e}')
+
+# No Parse error should occur with this code snippet

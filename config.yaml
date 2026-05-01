@@ -4,7 +4,7 @@ system:
 
 llm:
   provider: "groq" # Options: "local", "gemini"
-  api_key: "YOUR_GROQ_API_KEY_HERE" # Replace with your actual key
+  api_key: "" # Replace with your actual key
   model_id: "llama-3.3-70b-versatile"  # Or "TinyLlama/TinyLlama-1.1B-Chat-v1.0" for local
   device: "auto"
   max_length: 2048

@@ -47,6 +47,15 @@ class DevOpsAgent(Agent):
         project_dir = "generated_project"
         if not os.path.exists(project_dir):
             os.makedirs(project_dir)
+        else:
+            print(f"[{self.name}] Cleaning up previous deployment in {project_dir}/ ...")
+            import glob
+            for f in glob.glob(os.path.join(project_dir, "*")):
+                try:
+                    if os.path.isfile(f):
+                        os.remove(f)
+                except Exception as e:
+                    print(f"[{self.name}] Could not remove old file {f}: {e}")
             
         print(f"[{self.name}] Extracting generated files to {project_dir}/ ...")
         

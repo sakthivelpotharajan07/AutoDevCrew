@@ -120,21 +120,40 @@ class LLMEngine:
         if not hasattr(self, 'groq_client') or not self.groq_client:
             return "Error: Groq client not loaded."
 
+        model_id = self.config["llm"].get("model_id", "mixtral-8x7b-32768")
+        
         try:
-            model_id = self.config["llm"].get("model_id", "mixtral-8x7b-32768")
+            return self._call_groq_with_fallback(prompt, model_id)
+        except Exception as e:
+            logger.error(f"Groq generation error after fallbacks: {e}")
+            return f"Error calling Groq: {e}"
+
+    def _call_groq_with_fallback(self, prompt: str, primary_model: str):
+        try:
             chat_completion = self.groq_client.chat.completions.create(
-                messages=[
-                    {
-                        "role": "user",
-                        "content": prompt,
-                    }
-                ],
-                model=model_id,
+                messages=[{"role": "user", "content": prompt}],
+                model=primary_model,
             )
             return chat_completion.choices[0].message.content
         except Exception as e:
-            logger.error(f"Groq generation error: {e}")
-            return f"Error calling Groq: {e}"
+            error_str = str(e).lower()
+            if "429" in error_str or "rate" in error_str or "decommission" in error_str:
+                logger.warning(f"Error with {primary_model}. Falling back to llama-3.1-8b-instant...")
+                try:
+                    chat_completion_fallback = self.groq_client.chat.completions.create(
+                        messages=[{"role": "user", "content": prompt}],
+                        model="llama-3.1-8b-instant",
+                    )
+                    return chat_completion_fallback.choices[0].message.content
+                except Exception as fallback_e:
+                    logger.warning(f"Fallback model llama-3.1-8b-instant failed: {fallback_e}. Trying gemma2-9b-it...")
+                    chat_completion_fallback_2 = self.groq_client.chat.completions.create(
+                        messages=[{"role": "user", "content": prompt}],
+                        model="gemma2-9b-it",
+                    )
+                    return chat_completion_fallback_2.choices[0].message.content
+            # If it's not a recoverable error, raise it
+            raise e
 
     def _generate_local(self, prompt: str, max_new_tokens=256):
         print("DEBUG: Local Generate request received.")

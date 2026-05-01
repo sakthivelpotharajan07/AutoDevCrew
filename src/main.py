@@ -1,5 +1,7 @@
 import sys
 import os
+import truststore
+truststore.inject_into_ssl()
 
 # Add project root to sys.path
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -46,7 +48,7 @@ def run_cli(requirement):
 
 def start_api():
     # Use 'src.interface.api_server:app' which requires 'src' in path (added above)
-    uvicorn.run("src.interface.api_server:app", host="0.0.0.0", port=8000, reload=True)
+    uvicorn.run("src.interface.api_server:app", host="0.0.0.0", port=8000)
 
 def start_dashboard():
     # Streamlit runs as options, we need to ensure it has PYTHONPATH or runs from root

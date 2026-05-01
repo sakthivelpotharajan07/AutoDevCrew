@@ -1,24 +1,109 @@
-<!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login Page</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>Clothe Shopping Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+        }
+        .header {
+            background-color: #333;
+            color: #fff;
+            padding: 20px;
+            text-align: center;
+        }
+        .nav-bar {
+            background-color: #444;
+            padding: 10px;
+            text-align: center;
+        }
+        .nav-bar a {
+            color: #fff;
+            text-decoration: none;
+            margin: 10px;
+        }
+        .main-content {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .product-card {
+            background-color: #fff;
+            margin: 20px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 300px;
+        }
+        .product-card img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 10px 10px 0 0;
+        }
+        .product-card h2 {
+            font-size: 18px;
+            margin-top: 10px;
+        }
+        .product-card p {
+            font-size: 14px;
+            color: #666;
+        }
+        .product-card button {
+            background-color: #333;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        .product-card button:hover {
+            background-color: #444;
+        }
+    </style>
 </head>
 <body>
-    <div class="login-container">
-        <form id="login-form">
-            <label for="username">Username:</label>
-            <input type="text" id="username" name="username" required>
-
-            <label for="password">Password:</label>
-            <input type="password" id="password" name="password" required>
-
-            <button type="submit">Login</button>
-            <div class="error-message" id="error-message"></div>
-        </form>
+    <div class="header">
+        <h1>Clothe Shopping Dashboard</h1>
     </div>
-    <script src="script.js"></script>
+    <div class="nav-bar">
+        <a href="#">Men</a>
+        <a href="#">Women</a>
+        <a href="#">Kids</a>
+    </div>
+    <div class="main-content">
+        <div class="product-card">
+            <img src="https://via.placeholder.com/300x200?text=Men+Shirt" alt="Men Shirt">
+            <h2>Men's Cotton Shirt</h2>
+            <p>High quality cotton shirt for men. Available in various colors and sizes.</p>
+            <p>Price: $25.99</p>
+            <button>Add to Cart</button>
+        </div>
+        <div class="product-card">
+            <img src="https://via.placeholder.com/300x200?text=Women+Dress" alt="Women Dress">
+            <h2>Women's Summer Dress</h2>
+            <p>Beautiful summer dress for women. Made from high quality fabric.</p>
+            <p>Price: $39.99</p>
+            <button>Add to Cart</button>
+        </div>
+        <div class="product-card">
+            <img src="https://via.placeholder.com/300x200?text=Kids+T-Shirt" alt="Kids T-Shirt">
+            <h2>Kids' T-Shirt</h2>
+            <p>Cute and comfortable t-shirt for kids. Available in various colors and sizes.</p>
+            <p>Price: $14.99</p>
+            <button>Add to Cart</button>
+        </div>
+    </div>
+    <script>
+        // Add event listener to button clicks
+        const buttons = document.querySelectorAll('.product-card button');
+        buttons.forEach(button => {
+            button.addEventListener('click', () => {
+                // Add product to cart logic here
+                alert('Product added to cart!');
+            });
+        });
+    </script>
 </body>
 </html>

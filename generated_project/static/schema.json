@@ -1,0 +1,134 @@
+{
+  "title": "Attendance API Schema",
+  "description": "API endpoints and schema for attendance system",
+  "info": {
+    "version": "1.0.0",
+    "termsOfService": "https://example.com/terms-of-service",
+    "contact": {
+      "name": "John Doe",
+      "url": "https://example.com/about",
+      "email": "john.doe@example.com"
+    }
+  },
+  "host": "localhost:8000",
+  "basePath": "/api/v1",
+  "tags": [
+    {
+      "name": "attendance",
+      "description": "Attendance system"
+    }
+  ],
+  "paths": {
+    "/attendance": {
+      "get": {
+        "summary": "Get all attendance records",
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AttendanceRecord"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create new attendance record",
+        "requestBody": {
+          "$ref": "#/components/schemas/AttendanceRecord"
+        },
+        "responses": {
+          "201": {
+            "description": "Created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AttendanceRecord"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/attendance/{attendance_id}": {
+      "get": {
+        "summary": "Get attendance record by id",
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AttendanceRecord"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "summary": "Update attendance record",
+        "requestBody": {
+          "$ref": "#/components/schemas/AttendanceRecord"
+        },
+        "responses": {
+          "200": {
+            "description": "Updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AttendanceRecord"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete attendance record",
+        "responses": {
+          "204": {
+            "description": "Deleted successfully"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "AttendanceRecord": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "employee_id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "attendance_date": {
+            "type": "string",
+            "format": "date"
+          },
+          "status": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "employee_id",
+          "attendance_date",
+          "status"
+        ]
+      }
+    }
+  }
+}
